@@ -1,105 +1,124 @@
 # Ephpicman Plugin Starter
 
-A reusable starter repository for building independent Ephpicman WordPress plugins. It provides a small plugin lifecycle, shared EPM integration, translation automation, and basic CI. It intentionally does not include product-specific features or unnecessary abstractions.
+A reusable starter repository for building Ephpicman WordPress plugins. It provides a minimal plugin entry point, a product lifecycle class, shared EPM integration, translation automation, and basic CI. It intentionally excludes product-specific features and speculative abstractions.
 
 ## Platform requirements
 
-The starter's minimum platform requirements are:
+The plugin's declared minimum requirements are:
 
-- **PHP 8.0**
-- **WordPress 6.3**
+- **PHP 8.0** — declared as `Requires PHP: 8.0` in `index.php`.
+- **WordPress 6.3** — declared as `Requires at least: 6.3` in `index.php`.
 
-EPM requires PHP 8.0 or newer, so derived plugins must not lower the PHP minimum below 8.0. WordPress 6.3 and later are documented as fully supporting PHP 8.0. Products may raise either minimum when their code or dependencies require it, but must not lower either floor.
+Keep these values aligned with the plugin header. If a product derived from this template requires newer versions, raise the declarations and update the related documentation, PHPCS configuration, and CI coverage. Do not lower the requirements below what the product code and synchronized EPM version actually support.
 
-These are minimum compatibility declarations, not recommendations to run obsolete software. For production sites, use actively supported WordPress and PHP releases.
+These are minimum compatibility requirements, not recommendations to run outdated software. For production sites, use currently supported PHP and WordPress releases.
+
+## Architecture and request lifecycle
+
+EPM is the shared framework responsible for orchestrating the lifecycle of products built on it. WordPress remains the host platform and continues to own its native plugin hooks.
+
+1. WordPress loads `index.php`, which guards against direct access, defines the plugin file constant, loads the synchronized EPM bootstrap and the plugin class, and registers the plugin with `EpmLoader`.
+2. The entry point connects the plugin's activation and deactivation methods to WordPress and registers its initialization method on `init`.
+3. `src/Plugin.php` registers the active plugin's directory with EPM during initialization and loads the plugin's translations.
+4. The EPM bootstrap initializes its loader and invokes `EPM\\App::run()` on `wp_loaded`. This occurs after the plugin and theme have had their earlier WordPress initialization opportunities to register with EPM.
+5. Keep product behavior in the product's own source files. Shared framework code belongs in `epm/` and is maintained by the EPM synchronization workflow.
+
+The starter's lifecycle methods are intentionally small placeholders. Add behavior only when the product has a concrete requirement. Do not move WordPress-native activation or deactivation responsibilities into EPM.
 
 ## Repository structure
 
 ```text
-index.php                         Plugin header, bootstrap, and lifecycle hooks
-src/Plugin.php                    Plugin lifecycle and initialization
-epm/                              Shared EPM code, synchronized from Ephpicman/EPM
-languages/                        POT template and translated PO/MO catalogs
-.github/workflows/php-lint.yml    PHP syntax checks
+index.php                          Plugin metadata, bootstrap, and WordPress hooks
+src/Plugin.php                     Plugin lifecycle and initialization
+epm/bootstrap.php                  Shared EPM loader/bootstrap
+epm/src/                            Synchronized EPM framework source
+languages/                         POT template and translated PO/MO catalogs
+.github/workflows/php-lint.yml     PHP syntax checks
 .github/workflows/translations.yml Translation catalog generation and compilation
-.github/workflows/sync-epm.yml    Scheduled and manual EPM synchronization
-phpcs.xml.dist                    WordPress Coding Standards configuration
-LICENSE                           GPL-2.0-or-later license notice
+.github/workflows/sync-epm.yml     Scheduled and manual EPM synchronization
+phpcs.xml.dist                     WordPress Coding Standards configuration
+LICENSE                            GPL-2.0-or-later license notice
 ```
-
-The EPM workflow expects repository write permission so it can commit synchronized changes. Translation generation also needs contents write permission to commit updated catalogs.
 
 ## Creating a plugin from this template
 
-After creating a repository from this template, complete the following checklist before treating it as a product repository.
+Complete this checklist after creating a repository from the template and before treating it as a product repository.
 
 ### 1. Rename and identify the plugin
 
 Update all starter identity values, including:
 
-- Plugin name and description in the header of `index.php`.
-- Plugin URI and author details.
-- Plugin folder/repository slug and installation instructions.
-- PHP namespace in `src/Plugin.php` and the matching namespace passed to `EpmLoader::register()`.
+- Plugin name, description, URI, and author details in the header of `index.php`.
+- Repository/folder slug and installation instructions.
+- Namespace in `src/Plugin.php` and the matching namespace passed to `EpmLoader::register()`.
 - Text Domain in `index.php`, every translation call, and translation filenames.
-- The package name in PHPDoc `@package` annotations.
-- The plugin file constant name if you want a product-specific constant. Update every reference if it is renamed.
-- README title, links, examples, and any product-specific documentation.
+- PHPDoc `@package` annotations.
+- The plugin file constant, if you rename it, and every reference to it.
+- README title, links, examples, and other product-specific documentation.
 
-Keep the namespace unique to the product. Keep the Text Domain stable and unique to the plugin; it should match the plugin slug according to WordPress plugin internationalization conventions. Do not rename the translation files independently of the Text Domain.
+Keep the namespace unique to the product. Keep the Text Domain stable and unique, and aligned with the plugin slug under WordPress internationalization conventions. Update translation workflow paths and filenames whenever the domain or catalog names change.
 
-### 2. Set platform requirements
+### 2. Preserve platform requirements
 
-The starter declares `Requires PHP: 8.0` and `Requires at least: 6.3` in `index.php`. Update these declarations if the product needs newer versions. Also update `phpcs.xml.dist`, CI coverage, and this documentation when changing the tested minimum.
+The template declares **PHP 8.0** and **WordPress 6.3** as its minimum requirements. The same values are reflected in `phpcs.xml.dist` and the PHP lint workflow's minimum-version coverage.
 
-**Do not lower the PHP minimum below 8.0 or the WordPress minimum below 6.3.** EPM requires PHP 8.0 or newer. A product can increase the minimums, but cannot safely lower the shared foundation's requirements.
+When raising either minimum, update the plugin header, this section, PHPCS configuration where applicable, and CI coverage together. Do not claim compatibility with a version that is not covered by the code and its dependencies.
 
 ### 3. Configure translations
 
-- Keep translatable user-facing strings in WordPress internationalization functions such as `__()`, `_e()`, `esc_html__()`, and `esc_attr__()` as appropriate.
+- Wrap user-facing translatable strings in WordPress internationalization functions such as `__()`, `_e()`, `esc_html__()`, and `esc_attr__()`, as appropriate.
 - Use the product's Text Domain consistently.
-- Keep the `.po` source catalog under version control; the workflow generates the `.pot` catalog and compiles `.mo` files.
-- Review generated translation changes and verify that real translations are preserved.
+- Keep source `.po` catalogs under version control. The workflow generates the `.pot` template and compiles `.mo` files.
+- Review generated changes to ensure existing translations are preserved.
 - Remove starter/test strings and test translations that are not part of the product.
 
-The translation workflow currently updates `languages/ephpicman-plugin-fa_IR.po` when that file exists. If you rename the Text Domain or translation catalog, update `.github/workflows/translations.yml` to use the new filenames and domain.
+The current workflow uses `ephpicman-plugin` and updates `languages/ephpicman-plugin-fa_IR.po` when that file exists. Update `.github/workflows/translations.yml` when renaming the Text Domain or translation catalogs.
 
 ### 4. Add product behavior
 
-Implement product-specific code under `src/`. Keep shared framework code in `epm/`; that directory is maintained by the EPM synchronization workflow and should not be used for product-specific classes.
+Implement product-specific code under `src/`. Keep shared framework code under `epm/`; this directory is maintained by the EPM synchronization workflow and must not be used for product-specific classes.
 
-Add new abstractions only when they solve a real requirement. Do not add empty classes or generic infrastructure preemptively.
+Keep the entry point and main lifecycle class focused on bootstrapping, registration, and lifecycle boundaries. Add abstractions only when they solve a concrete requirement; avoid adding generic infrastructure preemptively.
 
-### 5. Review lifecycle hooks and data handling
+### 5. Handle lifecycle and data safely
 
-The starter registers activation and deactivation callbacks. Add work to these methods only when the product needs it. If the plugin later stores persistent data that should be removed on uninstall, design and document an explicit uninstall policy at that time. Do not add uninstall cleanup when there is no product data to clean up.
+The starter connects activation and deactivation callbacks to WordPress and provides an uninstall hook. Add work to these methods only when the product needs it. If the product stores persistent data that should be removed on uninstall, define an explicit cleanup policy before implementing it. Do not add cleanup for data that does not exist.
 
-For all product features, validate and sanitize input, check capabilities and nonces for privileged actions, use WordPress APIs, and escape output at the point where it is rendered. Do not commit secrets, credentials, environment-specific values, or production data.
+For product features:
 
-### 6. Review CI and repository settings
+- Validate and sanitize input.
+- Check capabilities and nonces for privileged actions.
+- Prefer WordPress APIs.
+- Escape output where it is rendered.
+- Do not commit secrets, credentials, environment-specific configuration, or production data.
 
-- Confirm the PHP lint workflow passes.
-- Run WordPress Coding Standards checks locally or add them to CI if that is part of the product's quality gate.
-- Confirm the translation workflow uses the product's Text Domain and catalog filenames.
-- Confirm EPM synchronization succeeds and that the expected `epm/bootstrap.php` and `epm/src/` files are present.
-- Check that the repository's Actions permissions allow only the writes required by the workflows.
+### 6. Check CI and repository settings
+
+- Confirm the PHP lint workflow passes. It currently checks syntax with PHP 8.0 and PHP 8.2.
+- Run WordPress Coding Standards checks locally or add them to CI if they are part of the product's quality gate.
+- Confirm the translation workflow uses the correct Text Domain and catalog filenames.
+- Confirm EPM synchronization succeeds and that the expected files under `epm/` are present.
+- Ensure GitHub Actions permissions allow only the writes required by the workflows.
 - Enable branch protection and require the appropriate checks before merging when the repository is ready for team development.
 
-The PHP lint workflow checks PHP syntax; it does not prove that WordPress can activate the plugin or that EPM initializes correctly. Test activation and product behavior in a WordPress environment before releasing a product.
+PHP lint verifies syntax only. It does not prove that WordPress can activate the plugin or that EPM initializes correctly. Test activation and actual product behavior in a WordPress environment before release.
 
 ## Development
 
-1. Clone the repository into a WordPress installation's `wp-content/plugins/<plugin-slug>` directory.
+1. Clone the repository into `wp-content/plugins/<plugin-slug>` in a WordPress installation.
 2. Complete the customization checklist above.
 3. Activate the plugin in WordPress.
-4. Add product-specific behavior under `src/`.
+4. Implement product-specific behavior under `src/`.
 5. Run PHP syntax and coding-standard checks before pushing changes.
+6. Test the plugin in a real WordPress environment.
 
 ## EPM synchronization
 
-GitHub Actions synchronizes `Ephpicman/EPM` `main` into `epm/` daily at 09:00 Asia/Tehran and supports manual runs from **Actions → Sync EPM → Run workflow**. The workflow uses `git subtree` with `--squash`, so it does not import EPM's full commit history.
+GitHub Actions synchronizes `Ephpicman/EPM` `main` into `epm/` daily at **09:00 Asia/Tehran** and supports manual runs through **Actions → Sync EPM → Run workflow**. The workflow uses `git subtree` with `--squash`, so it does not import EPM's full commit history.
 
-After creating a repository from the template, verify the first synchronization run. Do not assume the shared code is present until the workflow succeeds.
+Treat `epm/` as synchronized framework code rather than a place for local product changes. After creating a repository from this template, verify that the first synchronization run succeeds and that the framework files are present.
+
+The sync workflow needs repository contents write permission to commit updates. The translation workflow also needs contents write permission to commit generated catalogs.
 
 ## License
 
@@ -108,9 +127,10 @@ This starter is distributed under **GNU General Public License version 2 or, at 
 ## Design principles
 
 - Keep the foundation small and maintainable.
-- Treat EPM as shared infrastructure and keep product code separate.
+- Treat EPM as the shared framework and keep product code separate.
+- Preserve WordPress's native lifecycle hooks while letting EPM orchestrate product lifecycle.
 - Guard direct access to PHP files.
 - Use WordPress APIs and escape output at the point of rendering.
-- Prefer quick validation before adding features or abstractions.
-- Raise platform requirements when a product needs to, but never lower them beneath the shared EPM floor.
-- Do not store secrets or environment-specific configuration in the repository.
+- Validate product ideas and requirements before adding features or abstractions.
+- Keep the PHP and WordPress minimums consistent across metadata, configuration, CI, and documentation.
+- Never commit secrets or environment-specific configuration.
