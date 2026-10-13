@@ -14,27 +14,27 @@ msgstr ""
 "X-Domain: ephpicman-plugin\n"
 
 #. Plugin Name of the plugin
-#: ephpicman-plugin.php
+#: index.php
 msgid "Ephpicman Plugin Starter"
 msgstr ""
 
 #. Plugin URI of the plugin
-#: ephpicman-plugin.php
+#: index.php
 msgid "https://github.com/ephpicman/Plugin"
 msgstr ""
 
 #. Description of the plugin
-#: ephpicman-plugin.php
+#: index.php
 msgid "A lightweight foundation for Ephpicman WordPress plugins."
 msgstr ""
 
 #. Author of the plugin
-#: ephpicman-plugin.php
+#: index.php
 msgid "Ephpicman"
 msgstr ""
 
 #. Author URI of the plugin
-#: ephpicman-plugin.php
+#: index.php
 msgid "https://github.com/ephpicman"
 msgstr ""
 
