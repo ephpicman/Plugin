@@ -23,12 +23,20 @@ define( 'EPHPICMAN_PLUGIN_FILE', __FILE__ );
 define( 'EPHPICMAN_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'EPHPICMAN_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 
+require_once __DIR__ . '/epm/bootstrap.php';
+
+EpmLoader::register(
+	'1.4.0',
+	'EphpicmanPlugin\\',
+	__DIR__
+);
+
 require_once EPHPICMAN_PLUGIN_DIR . 'includes/class-activator.php';
 require_once EPHPICMAN_PLUGIN_DIR . 'includes/class-deactivator.php';
 require_once EPHPICMAN_PLUGIN_DIR . 'includes/class-plugin.php';
 
-register_activation_hook( __FILE__, array( 'EphpicmanPlugin\\Activator', 'activate' ) );
-register_deactivation_hook( __FILE__, array( 'EphpicmanPlugin\\Deactivator', 'deactivate' ) );
+register_activation_hook( __FILE__, array( 'EphpicmanPlugin\\\\Activator', 'activate' ) );
+register_deactivation_hook( __FILE__, array( 'EphpicmanPlugin\\\\Deactivator', 'deactivate' ) );
 
 /**
  * Start the plugin.
@@ -36,7 +44,7 @@ register_deactivation_hook( __FILE__, array( 'EphpicmanPlugin\\Deactivator', 'de
  * @return void
  */
 function ephpicman_plugin_run() {
-	$plugin = new EphpicmanPlugin\Plugin();
+	$plugin = new EphpicmanPlugin\\Plugin();
 	$plugin->run();
 }
 
