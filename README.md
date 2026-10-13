@@ -7,9 +7,9 @@ A reusable starter repository for building independent Ephpicman WordPress plugi
 The starter's minimum platform requirements are:
 
 - **PHP 8.0**
-- **WordPress 5.6**
+- **WordPress 6.3**
 
-EPM requires PHP 8.0 or newer, so derived plugins must not lower the PHP minimum below 8.0. WordPress 5.6 is the earliest WordPress release with PHP 8.0 support; that support was initially described as beta compatibility. WordPress 6.3 and later are documented as fully supporting PHP 8.0. Products may raise either minimum when their code or dependencies require it, but must not lower either floor.
+EPM requires PHP 8.0 or newer, so derived plugins must not lower the PHP minimum below 8.0. WordPress 6.3 and later are documented as fully supporting PHP 8.0. Products may raise either minimum when their code or dependencies require it, but must not lower either floor.
 
 These are minimum compatibility declarations, not recommendations to run obsolete software. For production sites, use actively supported WordPress and PHP releases.
 
@@ -50,9 +50,9 @@ Keep the namespace unique to the product. Keep the Text Domain stable and unique
 
 ### 2. Set platform requirements
 
-The starter declares `Requires PHP: 8.0` and `Requires at least: 5.6` in `index.php`. Update these declarations if the product needs newer versions. Also update `phpcs.xml.dist`, CI coverage, and this documentation when changing the tested minimum.
+The starter declares `Requires PHP: 8.0` and `Requires at least: 6.3` in `index.php`. Update these declarations if the product needs newer versions. Also update `phpcs.xml.dist`, CI coverage, and this documentation when changing the tested minimum.
 
-**Do not lower the PHP minimum below 8.0 or the WordPress minimum below 5.6.** EPM requires PHP 8.0 or newer. A product can increase the minimums, but cannot safely lower the shared foundation's requirements.
+**Do not lower the PHP minimum below 8.0 or the WordPress minimum below 6.3.** EPM requires PHP 8.0 or newer. A product can increase the minimums, but cannot safely lower the shared foundation's requirements.
 
 ### 3. Configure translations
 
