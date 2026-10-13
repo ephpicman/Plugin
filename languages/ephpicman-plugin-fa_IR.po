@@ -40,4 +40,4 @@ msgstr ""
 
 #: src/Plugin.php:49
 msgid "Hello"
-msgstr ""
+msgstr "سلام"
