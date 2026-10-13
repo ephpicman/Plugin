@@ -7,6 +7,8 @@
 
 namespace EphpicmanPlugin;
 
+use EPM\App;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -45,6 +47,9 @@ final class Plugin {
 	 * @return void
 	 */
 	public function init() {
+		// Register this plugin with EPM.
+		App::get_instance()->registerPlugin( dirname( EPHPICMAN_PLUGIN_FILE ) );
+
 		// Temporary translation-pipeline test string.
 		__( 'Hello', 'ephpicman-plugin' );
 
