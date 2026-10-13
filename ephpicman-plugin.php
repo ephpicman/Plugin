@@ -1,38 +1,35 @@
 <?php
 /**
- * Plugin Name:       Ephpicman Plugin Starter
- * Plugin URI:        https://github.com/ephpicman/Plugin
- * Description:       A lightweight foundation for Ephpicman WordPress plugins.
- * Version:           1.0.0
- * Requires at least: 6.4
- * Requires PHP:      7.4
- * Author:            Ephpicman
- * Author URI:        https://github.com/ephpicman
- * License:           GPL-2.0-or-later
- * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:       ephpicman-plugin
- * Domain Path:       /languages
+ * Backward-compatibility loader for installations that still have the legacy
+ * plugin path stored as active.
  *
  * @package EphpicmanPlugin
  */
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'EPHPICMAN_PLUGIN_FILE', __FILE__ );
+$legacy_plugin = plugin_basename( __FILE__ );
+$plugin_directory = dirname( $legacy_plugin );
+$new_plugin = ( '.' === $plugin_directory ? '' : $plugin_directory . '/' ) . 'index.php';
 
-require_once __DIR__ . '/epm/bootstrap.php';
-require_once __DIR__ . '/src/Plugin.php';
+$active_plugins = (array) get_option( 'active_plugins', array() );
 
-EpmLoader::register(
-	'1.4.0',
-	'EphpicmanPlugin\\',
-	__DIR__
-);
+if ( in_array( $legacy_plugin, $active_plugins, true ) ) {
+	$active_plugins = array_diff( $active_plugins, array( $legacy_plugin ) );
+	$active_plugins[] = $new_plugin;
 
-$plugin = EphpicmanPlugin\Plugin::get_instance();
+	update_option( 'active_plugins', array_values( array_unique( $active_plugins ) ) );
+}
 
-register_activation_hook( __FILE__, array( $plugin, 'activate' ) );
-register_deactivation_hook( __FILE__, array( $plugin, 'deactivate' ) );
-register_uninstall_hook( __FILE__, array( EphpicmanPlugin\Plugin::class, 'uninstall' ) );
+if ( is_multisite() ) {
+	$network_active_plugins = (array) get_site_option( 'active_sitewide_plugins', array() );
 
-add_action( 'init', array( $plugin, 'init' ) );
+	if ( isset( $network_active_plugins[ $legacy_plugin ] ) ) {
+		$network_active_plugins[ $new_plugin ] = $network_active_plugins[ $legacy_plugin ];
+		unset( $network_active_plugins[ $legacy_plugin ] );
+
+		update_site_option( 'active_sitewide_plugins', $network_active_plugins );
+	}
+}
+
+require_once __DIR__ . '/index.php';
