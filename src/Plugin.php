@@ -56,15 +56,6 @@ final class Plugin {
 	}
 
 	/**
-	 * Run uninstall routines.
-	 *
-	 * @return void
-	 */
-	public static function uninstall() {
-		// Delete plugin data here only when uninstall cleanup is required.
-	}
-
-	/**
 	 * Run activation routines.
 	 *
 	 * @return void
