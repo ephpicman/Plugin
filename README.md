@@ -10,12 +10,10 @@ A lightweight, production-minded starting point for custom WordPress plugins. Sh
 ## Structure
 
 ```
-index.php                 Main plugin entry point and lifecycle hooks
-ephpicman-plugin.php      Temporary compatibility loader for existing installs
+index.php                  Main plugin entry point and lifecycle hooks
 src/Plugin.php             Plugin lifecycle and initialization
 epm/                       Shared EPM code (automatically synchronized)
 languages/                 Translation catalogs
-uninstall.php              Safe uninstall entry point
 .github/workflows/         CI, translation generation, and EPM synchronization
 ```
 
@@ -26,7 +24,7 @@ uninstall.php              Safe uninstall entry point
 3. Add plugin-specific behavior under `src/`; keep shared infrastructure in `epm/`.
 4. Run PHP syntax checks before pushing changes.
 
-The legacy `ephpicman-plugin.php` file is retained as a compatibility loader. It migrates the stored active-plugin path to `index.php` for existing single-site and multisite installations, then loads the new entry point. It can be removed in a future release after the migration period.
+The starter currently stores no persistent plugin data, so it does not need an uninstall handler. Add uninstall cleanup only when the plugin begins creating data that should be removed on uninstall.
 
 ## EPM synchronization
 
