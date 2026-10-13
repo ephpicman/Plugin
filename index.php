@@ -4,7 +4,7 @@
  * Plugin URI:        https://github.com/ephpicman/Plugin
  * Description:       A lightweight foundation for Ephpicman WordPress plugins.
  * Version:           1.0.0
- * Requires at least: 5.6
+ * Requires at least: 6.3
  * Requires PHP:      8.0
  * Author:            Ephpicman
  * Author URI:        https://github.com/ephpicman
