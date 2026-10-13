@@ -37,3 +37,7 @@ msgstr ""
 #: ephpicman-plugin.php
 msgid "https://github.com/ephpicman"
 msgstr ""
+
+#: src/Plugin.php:49
+msgid "Hello"
+msgstr ""
