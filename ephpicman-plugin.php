@@ -44,7 +44,7 @@ register_deactivation_hook( __FILE__, array( 'EphpicmanPlugin\\\\Deactivator', '
  * @return void
  */
 function ephpicman_plugin_run() {
-	$plugin = new EphpicmanPlugin\\Plugin();
+	$plugin = new EphpicmanPlugin\Plugin();
 	$plugin->run();
 }
 
