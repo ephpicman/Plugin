@@ -18,10 +18,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'EPHPICMAN_PLUGIN_VERSION', '1.0.0' );
 define( 'EPHPICMAN_PLUGIN_FILE', __FILE__ );
-define( 'EPHPICMAN_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
-define( 'EPHPICMAN_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 
 require_once __DIR__ . '/epm/bootstrap.php';
 require_once __DIR__ . '/src/Plugin.php';
