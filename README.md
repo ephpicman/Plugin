@@ -10,23 +10,23 @@ A lightweight, production-minded starting point for custom WordPress plugins. Sh
 ## Structure
 
 ```
-ephpicman-plugin.php     Plugin entry point and lifecycle hooks
-includes/
-  class-plugin.php       Main plugin bootstrap
-  class-activator.php    Activation routines
-  class-deactivator.php  Deactivation routines
-epm/                     Shared EPM code (automatically synchronized)
-uninstall.php            Safe uninstall entry point
-.github/workflows/
-  sync-epm.yml           Daily EPM sync and manual trigger
+index.php                 Main plugin entry point and lifecycle hooks
+ephpicman-plugin.php      Temporary compatibility loader for existing installs
+src/Plugin.php             Plugin lifecycle and initialization
+epm/                       Shared EPM code (automatically synchronized)
+languages/                 Translation catalogs
+uninstall.php              Safe uninstall entry point
+.github/workflows/         CI, translation generation, and EPM synchronization
 ```
 
 ## Development
 
 1. Clone this repository into `wp-content/plugins/ephpicman-plugin`.
 2. Activate **Ephpicman Plugin Starter** in WordPress.
-3. Add plugin functionality in focused classes under `includes/`; keep product-specific behavior out of the shared `epm/` directory.
+3. Add plugin-specific behavior under `src/`; keep shared infrastructure in `epm/`.
 4. Run PHP syntax checks before pushing changes.
+
+The legacy `ephpicman-plugin.php` file is retained as a compatibility loader. It migrates the stored active-plugin path to `index.php` for existing single-site and multisite installations, then loads the new entry point. It can be removed in a future release after the migration period.
 
 ## EPM synchronization
 
