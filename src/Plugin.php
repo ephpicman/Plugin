@@ -45,6 +45,9 @@ final class Plugin {
 	 * @return void
 	 */
 	public function init() {
+		// Temporary translation-pipeline test string.
+		__( 'Hello', 'ephpicman-plugin' );
+
 		load_plugin_textdomain(
 			'ephpicman-plugin',
 			false,
