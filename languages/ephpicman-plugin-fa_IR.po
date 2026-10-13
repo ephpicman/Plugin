@@ -38,6 +38,6 @@ msgstr ""
 msgid "https://github.com/ephpicman"
 msgstr ""
 
-#: src/Plugin.php:49
+#: src/Plugin.php:54
 msgid "Hello"
 msgstr "سلام"
