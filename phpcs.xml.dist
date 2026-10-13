@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<ruleset name="Ephpicman Plugin">
+	<description>WordPress Coding Standards for Ephpicman Plugin Starter.</description>
+	<file>.</file>
+	<exclude-pattern>epm/*</exclude-pattern>
+	<exclude-pattern>vendor/*</exclude-pattern>
+	<arg name="basepath" value="."/>
+	<arg name="colors"/>
+	<arg value="sp"/>
+	<config name="minimum_supported_wp_version" value="6.4"/>
+	<rule ref="WordPress"/>
+</ruleset>
