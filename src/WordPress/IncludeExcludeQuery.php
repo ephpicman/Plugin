@@ -2,144 +2,114 @@
 
 declare(strict_types=1);
 
-/**
- * WordPress user inclusion and exclusion query argument builder.
- *
- * @package EPM
- * @version 1.0.0
- * @license MIT
- * @since 1.0.0
- */
-
 namespace EPM\WordPress;
 
-\defined('ABSPATH') || exit;
+use EPM\Utils\ArrayUtil;
 
 /**
- * Fluent builder for include and exclude arguments accepted by WP_User_Query.
+ * Builds a query value containing mutually exclusive included and excluded values.
  *
- * @see https://developer.wordpress.org/reference/classes/wp_user_query/
+ * Extends IncludeQuery with an exclusion list. Adding a value to one list
+ * removes the same value from the other list.
  */
-class IncludeExcludeQuery extends Query
+\defined('ABSPATH') || exit;
+
+class IncludeExcludeQuery extends IncludeQuery
 {
     /**
-     * User IDs included in the query.
+     * Values that must be excluded from the query.
      *
-     * @var int[]
+     * @var array<int, int|float|string>
      */
-    private array $include = [];
+    protected array $excluded = [];
 
     /**
-     * User IDs excluded from the query.
+     * Creates the query and optionally initializes its included and excluded values.
      *
-     * @var int[]
+     * @param array $queryArray Initial query data. The 'excluded' key initializes
+     *                          the exclusion list; other supported data is handled
+     *                          by the parent constructor.
+     * @param int   $type       Casting mode used for query values, such as INTEGER
+     *                          or STRING.
      */
-    private array $exclude = [];
-
-    /**
-     * Create an inclusion and exclusion query builder.
-     *
-     * @param array<string, mixed> $queryArray Existing WordPress query arguments.
-     */
-    public function __construct(array $queryArray = [])
+    public function __construct(array $queryArray = [], int $type = self::INTEGER)
     {
-        if (isset($queryArray['include'])) {
-            $this->include = array_map('absint', (array) $queryArray['include']);
-        }
+        parent::__construct($queryArray, $type);
 
-        if (isset($queryArray['exclude'])) {
-            $this->exclude = array_map('absint', (array) $queryArray['exclude']);
+        if (isset($queryArray['excluded'])) {
+            $this->exclude((array) $queryArray['excluded']);
         }
     }
 
     /**
-     * Create a new inclusion and exclusion query builder.
+     * Adds values to the inclusion list.
      *
-     * @param array<string, mixed> $queryArray Existing WordPress query arguments.
-     * @return static
+     * Values are cast using the configured type, deduplicated by the parent
+     * helper, and removed from the exclusion list.
+     *
+     * @param int|float|string|array $value One value or a list of values to include.
+     *
+     * @return self The current query instance for method chaining.
      */
-    public static function make(array $queryArray = []): static
+    public function include(int|float|string|array $value): self
     {
-        return new static($queryArray);
-    }
+        $values = ArrayUtil::castValues($value, [$this, 'cast']);
 
-    /**
-     * Include one user by ID.
-     *
-     * Replaces the existing include list.
-     *
-     * @param int $id User ID.
-     * @return $this
-     */
-    public function byId(int $id): self
-    {
-        $this->include = [absint($id)];
+        $this->mergeIncluded($values);
+
+        $this->excluded = ArrayUtil::removeValues(
+            $this->excluded,
+            $values
+        );
 
         return $this;
     }
 
     /**
-     * Include users by their IDs.
+     * Adds values to the exclusion list.
      *
-     * Replaces the existing include list.
+     * Values are cast using the configured type, deduplicated, and removed
+     * from the inclusion list.
      *
-     * @param int[] $ids User IDs.
-     * @return $this
+     * @param int|float|string|array $value One value or a list of values to exclude.
+     *
+     * @return self The current query instance for method chaining.
      */
-    public function byIds(array $ids): self
+    public function exclude(int|float|string|array $value): self
     {
-        $this->include = array_values(array_unique(array_map('absint', $ids)));
+        $values = ArrayUtil::castValues($value, [$this, 'cast']);
+
+        $this->excluded = \array_values(
+            \array_unique(
+                \array_merge($this->excluded, $values),
+                SORT_REGULAR
+            )
+        );
+
+        $this->included = ArrayUtil::removeValues(
+            $this->included,
+            $values
+        );
 
         return $this;
     }
 
     /**
-     * Exclude one user by ID.
+     * Returns the query state as an array.
      *
-     * Replaces the existing exclude list.
+     * The parent output contains the included values. The 'excluded' key is
+     * added only when the exclusion list is not empty.
      *
-     * @param int $id User ID.
-     * @return $this
-     */
-    public function avoidId(int $id): self
-    {
-        $this->exclude = [absint($id)];
-
-        return $this;
-    }
-
-    /**
-     * Exclude users by their IDs.
-     *
-     * Replaces the existing exclude list.
-     *
-     * @param int[] $ids User IDs.
-     * @return $this
-     */
-    public function avoidIds(array $ids): self
-    {
-        $this->exclude = array_values(array_unique(array_map('absint', $ids)));
-
-        return $this;
-    }
-
-    /**
-     * Return the WordPress inclusion and exclusion query arguments.
-     *
-     * @return array<string, int[]>
+     * @return array<string, array<int, int|float|string>|int|string>
      */
     public function toArray(): array
     {
-        $args = [];
+        $output = parent::toArray();
 
-        if ([] !== $this->include) {
-            $args['include'] = $this->include;
+        if ([] !== $this->excluded) {
+            $output['excluded'] = $this->excluded;
         }
 
-        if ([] !== $this->exclude) {
-            $args['exclude'] = $this->exclude;
-        }
-
-        return $args;
+        return $output;
     }
 }
