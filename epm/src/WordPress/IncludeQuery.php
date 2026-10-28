@@ -42,24 +42,24 @@ use EPM\Utils\ArrayUtil;
 use EPM\Utils\NumberUtil;
 
 /**
+ * Builds an inclusion list as part of EPM's internal query structure.
  *
- * Builds an include list for WordPress query arguments.
- *
- * Values can be normalized as absolute integers or strings, depending on the configured type. Duplicate values are
- * removed while preserving their order.
+ * Values are normalized as non-negative integers or strings, depending on whether identifier mode is enabled.
+ * Duplicate values are removed while preserving their order. The internal 'included' key is translated by a separate
+ * layer when preparing arguments for a specific WordPress API.
  */
 class IncludeQuery implements Query
 {
     /**
-     * Indicates if current query is subject to an **ID (positive integer)** list.
+     * Indicates whether values are normalized as non-negative integers or strings.
      * @var bool
      */
     protected bool $isIdentifier = true;
 
     /**
-     * The normalized, unique values to include in the query
+     * The normalized, unique values to include in the query.
+     *
      * @var array<int, int|string>
-     * 
      * @lock-type
      * @lock-value
      */
@@ -69,7 +69,7 @@ class IncludeQuery implements Query
      * Creates an include query.
      *
      * @param array $queryArray   Initial query data; the 'included' key is read when present.
-     * @param bool  $isIdentifier true if current query is subject to an ID, otherwise false.
+     * @param bool  $isIdentifier true to normalize values as non-negative integers, otherwise as strings.
      *
      * @lock-signature
      */
@@ -83,11 +83,12 @@ class IncludeQuery implements Query
     }
 
     /**
-     * Create an instance from query data and optional configuration.
-     * The normalization type may be provided in `$args['type']`; it defaults to `INTEGER`.
+     * Creates an instance from query data and optional configuration.
+     * The `$args['isIdentifier']` value determines whether values are normalized as non-negative integers or strings;
+     * it defaults to `true`.
      *
      * @param array $queryArray Initial query data.
-     * @param array $args       Optional configuration, including 'type'.
+     * @param array $args       Optional configuration, including 'isIdentifier'.
      * @return static           A new instance of the called class.
      *
      * @lock-signature
@@ -98,9 +99,9 @@ class IncludeQuery implements Query
     }
 
     /**
-     * Cast a value according to the configured normalization type.
+     * Cast a value according to the configured mode.
      *
-     * Integer mode uses WordPress's absint() helper; string mode converts the value to a string.
+     * Identifier mode normalizes the value as a non-negative integer; otherwise, the value is converted to a string.
      *
      * @param int|float|string $value Value to normalize.
      * @return int|string             The normalized value.
@@ -115,7 +116,7 @@ class IncludeQuery implements Query
     /**
      * Add one or more values to the include list.
      *
-     * Each value is normalized according to the configured type. Duplicate values are removed, while existing values
+     * Each value is normalized according to the configured mode. Duplicate values are removed, while existing values
      * retain their order.
      *
      * @param int|float|string|array $value A single value or a list of values.
@@ -126,19 +127,16 @@ class IncludeQuery implements Query
     public function include(int|float|string|array $value): static
     {
         $this->mergeIncluded(
-            ArrayUtil::castValues($value, [$this, 'cast'])
+            ArrayUtil::castValues($value, fn($item) => $this->cast($item))
         );
 
         return $this;
     }
 
     /**
-     * Convert the include query to its array representation.
+     * Returns the normalized inclusion list in EPM's internal query structure.
      *
-     * Returns an empty array when no values have been added; otherwise returns the 'included' key with the normalized
-     * values.
-     *
-     * @return array<string, array<int, int|float|string>|int|string>
+     * @return array<string, mixed>
      *
      * @lock-signature
      */
