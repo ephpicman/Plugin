@@ -39,10 +39,10 @@ declare(strict_types=1);
 namespace EPM\WordPress;
 
 /**
- * Builds search-related arguments for a WordPress query.
+ * Represents search criteria in EPM's internal query structure.
  *
  * Encapsulates a search term and the columns in which the search should be performed. Requested columns are validated
- * against an explicitly supplied allowlist before the configuration is converted to WordPress query arguments.
+ * against an explicitly supplied allowlist. Translation to WordPress-specific argument names belongs to the caller.
  *
  * @see WP_Query
  * @see WP_User_Query
@@ -90,6 +90,14 @@ class SearchQuery implements Query
      */
     public function __construct(array $allowedSearchColumns, array $queryArray = [])
     {
+        foreach ($allowedSearchColumns as $column) {
+            if (!\is_string($column)) {
+                throw new \InvalidArgumentException(
+                    'Every allowed search column must be a string.'
+                );
+            }
+        }
+
         $this->allowedSearchColumns = \array_values(
             \array_unique($allowedSearchColumns, SORT_STRING)
         );
@@ -165,11 +173,17 @@ class SearchQuery implements Query
                             throw new \InvalidArgumentException('Every search column must be a string.');
                         }
 
-                        if (!\in_array($item, $this->allowedSearchColumns, true)) {
-                            throw new \InvalidArgumentException('Invalid search column: ' . $item);
+                        if ('' === $item) {
+                            return false;
                         }
 
-                        return '' !== $item;
+                        if (!\in_array($item, $this->allowedSearchColumns, true)) {
+                            throw new \InvalidArgumentException(
+                                'Invalid search column: ' . $item
+                            );
+                        }
+
+                        return true;
                     }
                 ),
                 SORT_STRING
@@ -182,13 +196,12 @@ class SearchQuery implements Query
     }
 
     /**
-     * Convert the configured search values to WordPress query arguments.
+     * Export the configured search values using EPM's internal keys.
      *
-     * The internal searchColumns property is exported using the WordPress argument name search_columns. Properties that
-     * are not configured are omitted from the resulting array.
+     * Returns EPM's internal keys. Properties that are not configured are omitted from the result.
      *
-     * @return array<string, string|array<int, string>> The configured WordPress search arguments.
-     * 
+     * @return array<string, string|array<int, string>> The configured search values.
+     *
      * @lock-signature
      */
     public function toArray(): array
@@ -200,7 +213,7 @@ class SearchQuery implements Query
         }
 
         if ([] !== $this->searchColumns) {
-            $output['search_columns'] = $this->searchColumns;
+            $output['searchColumns'] = $this->searchColumns;
         }
 
         return $output;

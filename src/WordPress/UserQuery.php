@@ -33,7 +33,7 @@ class UserQuery
 
     private MetaQuery $metaQuery;
 
-    private ?string $orderBy = null;
+    private string|array|null $orderBy = null;
 
     private ?string $order = null;
 
@@ -58,10 +58,14 @@ class UserQuery
             [
                 'included' => $queryArray['role__in'] ?? [],
                 'excluded' => $queryArray['role__not_in'] ?? [],
-                'is' => $queryArray['role__and'] ?? null,
+                'is' => isset($queryArray['role'])
+                    ? (array) $queryArray['role']
+                    : (isset($queryArray['role__and'])
+                        ? (array) $queryArray['role__and']
+                        : null),
             ],
             [
-                'type' => IncludeQuery::STRING,
+                'isIdentifier' => false,
                 'multiValue' => true,
             ]
         );
@@ -79,7 +83,7 @@ class UserQuery
                 'is' => $queryArray['login'] ?? null,
             ],
             [
-                'type' => IncludeQuery::STRING,
+                'isIdentifier' => false,
             ]
         );
 
@@ -90,7 +94,7 @@ class UserQuery
                 'is' => $queryArray['nicename'] ?? null,
             ],
             [
-                'type' => IncludeQuery::STRING,
+                'isIdentifier' => false,
             ]
         );
 
@@ -120,15 +124,18 @@ class UserQuery
         }
 
         if (isset($queryArray['order'])) {
-            $this->order = $queryArray['order'];
+            $this->order = 'DESC' === \strtoupper($queryArray['order'])
+                ? 'DESC'
+                : 'ASC';
         }
 
         if (isset($queryArray['number'])) {
-            $this->number = (int) $queryArray['number'];
+            $number = (int) $queryArray['number'];
+            $this->number = -1 === $number ? -1 : \max(0, $number);
         }
 
         if (isset($queryArray['offset'])) {
-            $this->offset = (int) $queryArray['offset'];
+            $this->offset = \max(0, (int) $queryArray['offset']);
         }
 
         if (\array_key_exists('fields', $queryArray)) {
@@ -277,7 +284,7 @@ class UserQuery
             ->searchColumns('display_name');
     }
 
-    public function orderBy(string $field, string $direction = 'ASC'): self
+    public function orderBy(string|array $field, string $direction = 'ASC'): self
     {
         $this->orderBy = $field;
         $this->order = 'DESC' === \strtoupper($direction)
@@ -289,7 +296,7 @@ class UserQuery
 
     public function limit(int $number): self
     {
-        $this->number = $number;
+        $this->number = -1 === $number ? -1 : \max(0, $number);
 
         return $this;
     }
@@ -531,7 +538,7 @@ class UserQuery
         }
 
         if (isset($roleQuery['is'])) {
-            $args['role__and'] = $roleQuery['is'];
+            $args['role'] = $roleQuery['is'];
         }
 
         $loginQuery = $this->loginQuery->toArray();
@@ -562,10 +569,15 @@ class UserQuery
             $args['nicename'] = $nicenameQuery['is'];
         }
 
-        $args = \array_merge(
-            $args,
-            $this->searchQuery->toArray()
-        );
+        $searchQuery = $this->searchQuery->toArray();
+
+        if (isset($searchQuery['search'])) {
+            $args['search'] = $searchQuery['search'];
+        }
+
+        if (isset($searchQuery['searchColumns'])) {
+            $args['search_columns'] = $searchQuery['searchColumns'];
+        }
 
         if (null !== $this->orderBy) {
             $args['orderby'] = $this->orderBy;
@@ -584,7 +596,26 @@ class UserQuery
         }
 
         if (null !== $this->fields) {
-            $args['fields'] = $this->fields;
+            if ('all' === $this->fields) {
+                $args['fields'] = 'all';
+            } elseif (\is_array($this->fields)) {
+                $userFields = \array_values(
+                    \array_filter(
+                        $this->fields,
+                        static fn ($field): bool =>
+                            \is_string($field)
+                            && \in_array($field, self::USER_COLUMNS, true)
+                    )
+                );
+
+                $args['fields'] = [] !== $userFields ? $userFields : 'ID';
+            } else {
+                $args['fields'] = \in_array(
+                    $this->fields,
+                    self::USER_COLUMNS,
+                    true
+                ) ? $this->fields : 'ID';
+            }
         }
 
         if (null !== $this->countTotal) {
@@ -604,7 +635,7 @@ class UserQuery
     {
         $args = $this->toArray();
 
-        if (null !== $this->fields) {
+        if ([] !== $this->getSelectedMetaFields()) {
             $args['fields'] = 'all';
         }
 
