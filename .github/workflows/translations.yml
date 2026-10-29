@@ -39,7 +39,7 @@ jobs:
           php wp-cli.phar --info
 
       - name: Generate POT from PHP source
-        run: php wp-cli.phar i18n make-pot . languages/ephpicman-plugin.pot --domain=ephpicman-plugin
+        run: php wp-cli.phar i18n make-pot . languages/ephpicman-plugin.pot --domain=ephpicman-plugin --exclude=epm
 
       - name: Update existing PO catalogs without discarding translations
         run: |
