@@ -2,7 +2,7 @@
 /**
  * Application entry point.
  *
- * @package EphpicMan
+ * @package EPM
  */
 
 namespace EphpicMan;
