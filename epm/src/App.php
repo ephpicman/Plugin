@@ -2,10 +2,10 @@
 /**
  * Application entry point.
  *
- * @package EPM
+ * @package EphpicMan
  */
 
-namespace EPM;
+namespace EphpicMan;
 
 defined( 'ABSPATH' ) || exit;
 
