@@ -36,9 +36,9 @@
 
 declare(strict_types=1);
 
-namespace EphpicMan\WordPress;
+namespace EPM\WordPress;
 
-use EphpicMan\Utils\ArrayUtil;
+use EPM\Utils\ArrayUtil;
 
 /**
  * Builds inclusion and exclusion lists as part of EPM's internal query structure.
