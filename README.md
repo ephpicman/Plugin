@@ -33,10 +33,13 @@ src/Plugin.php                     Plugin lifecycle and initialization
 epm/bootstrap.php                  Shared EPM loader/bootstrap
 epm/src/                            Synchronized EPM framework source
 languages/                         POT template and translated PO/MO catalogs
-.github/workflows/php-lint.yml     PHP syntax checks
+.github/workflows/php-lint.yml     PHP syntax checks across PHP 8.0–8.5
+.github/workflows/phpcs.yml         WordPress Coding Standards checks
+.github/workflows/wordpress-tests.yml WordPress integration-test matrix
 .github/workflows/translations.yml Translation catalog generation and compilation
 .github/workflows/sync-epm.yml     Scheduled and manual EPM synchronization
 phpcs.xml.dist                     WordPress Coding Standards configuration
+tests/test-plugin-integration.php  WordPress bootstrap integration test
 LICENSE                            GPL-2.0-or-later license notice
 ```
 
