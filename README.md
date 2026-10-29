@@ -70,7 +70,7 @@ When raising either minimum, update the plugin header, this section, PHPCS confi
 - Use the product's Text Domain consistently.
 - Keep source `.po` catalogs under version control. The workflow generates the `.pot` template and compiles `.mo` files.
 - Review generated changes to ensure existing translations are preserved.
-- Remove starter/test strings and test translations that are not part of the product.
+- Remove starter/test strings and test translations that are not part of the product. In particular, `src/Plugin.php` contains a temporary `__( 'Hello', 'ephpicman-plugin' )` call solely to verify the translation pipeline. Delete that call when deriving a real plugin from this template, along with its test translation if no longer needed.
 
 The current workflow uses `ephpicman-plugin` and updates `languages/ephpicman-plugin-fa_IR.po` when that file exists. Update `.github/workflows/translations.yml` when renaming the Text Domain or translation catalogs.
 
@@ -94,14 +94,15 @@ For product features:
 
 ### 6. Check CI and repository settings
 
-- Confirm the PHP lint workflow passes. It currently checks syntax with PHP 8.0 and PHP 8.2.
-- Run WordPress Coding Standards checks locally or add them to CI if they are part of the product's quality gate.
+- Confirm the PHP lint workflow passes across PHP 8.0–8.5.
+- Confirm the PHPCS workflow passes using the WordPress Coding Standards ruleset.
+- Confirm the WordPress integration-test workflow passes against the minimum supported WordPress version and the latest WordPress release, across the configured PHP matrix.
 - Confirm the translation workflow uses the correct Text Domain and catalog filenames.
 - Confirm EPM synchronization succeeds and that the expected files under `epm/` are present.
 - Ensure GitHub Actions permissions allow only the writes required by the workflows.
 - Enable branch protection and require the appropriate checks before merging when the repository is ready for team development.
 
-PHP lint verifies syntax only. It does not prove that WordPress can activate the plugin or that EPM initializes correctly. Test activation and actual product behavior in a WordPress environment before release.
+PHP lint verifies syntax only. The WordPress integration-test workflow installs WordPress, loads the plugin in that environment, and runs PHPUnit integration tests. Keep meaningful tests under `tests/`; syntax checks alone do not prove that the plugin behaves correctly. The starter test is intentionally minimal and should be expanded as product behavior is added.
 
 ## Development
 
@@ -109,8 +110,9 @@ PHP lint verifies syntax only. It does not prove that WordPress can activate the
 2. Complete the customization checklist above.
 3. Activate the plugin in WordPress.
 4. Implement product-specific behavior under `src/`.
-5. Run PHP syntax and coding-standard checks before pushing changes.
-6. Test the plugin in a real WordPress environment.
+5. Run PHP syntax and WordPress Coding Standards checks before pushing changes.
+6. Run the WordPress integration tests against the minimum supported and latest WordPress versions.
+7. Test product-specific behavior in a real WordPress environment.
 
 ## EPM synchronization
 
