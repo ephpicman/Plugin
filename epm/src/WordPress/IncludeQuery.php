@@ -36,10 +36,10 @@
 
 declare(strict_types=1);
 
-namespace EPM\WordPress;
+namespace EphpicMan\WordPress;
 
-use EPM\Utils\ArrayUtil;
-use EPM\Utils\NumberUtil;
+use EphpicMan\Utils\ArrayUtil;
+use EphpicMan\Utils\NumberUtil;
 
 /**
  * Builds an inclusion list as part of EPM's internal query structure.
