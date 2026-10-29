@@ -36,7 +36,7 @@
 
 declare(strict_types=1);
 
-namespace EPM\WordPress;
+namespace EphpicMan\WordPress;
 
 /**
  * Base contract for query objects that represent EPM query data.
