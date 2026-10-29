@@ -75,7 +75,7 @@ When raising either minimum, update the plugin header, this section, PHPCS confi
 - Review generated changes to ensure existing translations are preserved.
 - Remove starter/test strings and test translations that are not part of the product. In particular, `src/Plugin.php` contains a temporary `__( 'Hello', 'ephpicman-plugin' )` call solely to verify the translation pipeline. Delete that call when deriving a real plugin from this template, along with its test translation if no longer needed.
 
-The current workflow uses `ephpicman-plugin` and updates `languages/ephpicman-plugin-fa_IR.po` when that file exists. Update `.github/workflows/translations.yml` when renaming the Text Domain or translation catalogs.
+The current workflow uses `ephpicman-plugin`, excludes the synchronized `epm/` directory, and updates `languages/ephpicman-plugin-fa_IR.po` when that file exists. EPM does not provide translation catalogs; each plugin owns and maintains its own Text Domain and translations. Update `.github/workflows/translations.yml` when renaming the Text Domain or translation catalogs.
 
 ### 4. Add product behavior
 
