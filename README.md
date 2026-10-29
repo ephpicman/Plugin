@@ -20,7 +20,7 @@ EPM is the shared framework responsible for orchestrating the lifecycle of produ
 1. WordPress loads `index.php`, which guards against direct access, defines the plugin file constant, loads the synchronized EPM bootstrap and the plugin class, and registers the plugin with `EpmLoader`.
 2. The entry point connects the plugin's activation and deactivation methods to WordPress and registers its initialization method on `init`.
 3. `src/Plugin.php` registers the active plugin's directory with EPM during initialization and loads the plugin's translations.
-4. The EPM bootstrap initializes its loader and invokes `EPM\\App::run()` on `wp_loaded`. This occurs after the plugin and theme have had their earlier WordPress initialization opportunities to register with EPM.
+4. The EPM bootstrap initializes its loader and invokes `EphpicMan\\App::run()` on `wp_loaded`. This occurs after the plugin and theme have had their earlier WordPress initialization opportunities to register with EPM.
 5. Keep product behavior in the product's own source files. Shared framework code belongs in `epm/` and is maintained by the EPM synchronization workflow.
 
 The starter's lifecycle methods are intentionally small placeholders. Add behavior only when the product has a concrete requirement. Do not move WordPress-native activation or deactivation responsibilities into EPM.
