@@ -122,7 +122,7 @@ if ( ! class_exists( 'EpmLoader', false ) ) {
             spl_autoload_register(
                 static function ( string $class ) use ( $epm_src ): void {
                     self::load_class( $class, array(
-                        'EphpicMan\\' => $epm_src,
+                        'EPM\\' => $epm_src,
                     ) );
                 }
             );
@@ -166,7 +166,7 @@ if ( ! class_exists( 'EpmLoader', false ) ) {
     }
 
     add_action( 'wp_loaded', static function (): void {
-        EphpicMan\App::get_instance()->run();
+        EPM\App::get_instance()->run();
     } );
 }
 
