@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-namespace EphpicMan\Utils;
+namespace EPM\Utils;
 
 final class NumberUtil
 {
