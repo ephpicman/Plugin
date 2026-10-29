@@ -36,7 +36,7 @@
 
 declare(strict_types=1);
 
-namespace EphpicMan\WordPress;
+namespace EPM\WordPress;
 
 /**
  * Fluent builder for the meta_query argument used by WordPress query APIs.
