@@ -5,7 +5,7 @@
  * @package EPM
  */
 
-namespace EphpicMan;
+namespace EPM;
 
 defined( 'ABSPATH' ) || exit;
 
