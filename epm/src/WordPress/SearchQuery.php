@@ -36,7 +36,7 @@
 
 declare(strict_types=1);
 
-namespace EphpicMan\WordPress;
+namespace EPM\WordPress;
 
 /**
  * Represents search criteria in EPM's internal query structure.
