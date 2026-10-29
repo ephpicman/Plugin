@@ -4,12 +4,12 @@
  *
  * Provides a lightweight API for querying users and wrapping user entities.
  *
- * @package EphpicMan
+ * @package EPM
  */
 
-namespace EphpicMan\Models;
+namespace EPM\Models;
 
-use EphpicMan\WordPress\UserQuery;
+use EPM\WordPress\UserQuery;
 
 defined( 'ABSPATH' ) || exit;
 
