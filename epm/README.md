@@ -1,5 +1,6 @@
-# EPM
+# EphpicMan Framework
 
-EPM is a PHP library for building reusable query objects for WordPress.
+## Requirements
 
-This change verifies the required status checks on pull requests.
+- PHP 8.0 or later
+- WordPress 6.3 or later
